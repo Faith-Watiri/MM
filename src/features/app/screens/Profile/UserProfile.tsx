@@ -102,7 +102,7 @@ export function UserProfile() {
         <FeatherIcon name="share-2" size={24} color="black" />
       </View>
 
-      <ScrollView className="mt-5">
+      <ScrollView showsVerticalScrollIndicator={false} className="mt-5">
         {settingsData.map(item => (
           <View key={item.id} className="flex-row justify-between my-2">
             <View className="flex-row items-center">
@@ -119,12 +119,11 @@ export function UserProfile() {
           </View>
         ))}
 
-        {role === 'COLLECTOR' && (
-          <PrimaryButton
-            name="Become an Artist"
-            onPress={() => {}}
-          />
-        )}
+        <View className="mt-4">
+          {role === 'COLLECTOR' && (
+            <PrimaryButton name="Become an Artist" onPress={() => {}} />
+          )}
+        </View>
 
         <TouchableHighlight
           className="my-2"
