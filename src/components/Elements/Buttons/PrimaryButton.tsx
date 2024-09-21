@@ -1,11 +1,10 @@
-/* eslint-disable prettier/prettier */
 import React from 'react';
 import {Button} from 'react-native-paper';
 
 type PrimaryButtonProps = {
   onPress: () => void;
   name: string;
-  width: string | number;
+  width?: string | number;
 };
 
 export function PrimaryButton({onPress, name, width}: PrimaryButtonProps) {
@@ -13,7 +12,7 @@ export function PrimaryButton({onPress, name, width}: PrimaryButtonProps) {
     <Button
       onPress={onPress}
       style={{
-        width: width,
+        width: width ? width : '100%',
       }}
       className={'bg-primary py-2 rounded-full text-[16px]'}
       textColor="white">

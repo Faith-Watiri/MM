@@ -4,7 +4,7 @@ import {BottomStack} from './BottomStack';
 import {Category} from '../features/app/screens/Category/[id]';
 import {SingleArt} from '../features/app';
 import {Cart} from '../features/cart/screens/Cart';
-import { PaymentScreen } from '../features/payment';
+import {PaymentScreen} from '../features/payment';
 
 const Stack = createNativeStackNavigator();
 

@@ -1,22 +1,26 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/no-unstable-nested-components */
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import {
   AddArtScreen,
   HomeScreen,
-  ProfileScreen,
   SearchScreen,
 } from '../features/app';
-import {View} from 'react-native';
+import { View } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 import FavoritesScreen from '../features/app/screens/Art/Favorites';
-import { UserProfile } from '../features/app/screens';
+import { UserProfile } from '../features/app';
+import { useUserAuth } from '../features/auth/slices/auth.slice';
 
 const Tab = createBottomTabNavigator();
 
 export function BottomStack() {
+  const { role } = useUserAuth();
+
+  console.log('Role: ', role);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -33,6 +37,8 @@ export function BottomStack() {
         },
         headerShown: false,
       }}>
+
+      {/* Home Screen */}
       <Tab.Screen
         name="Home"
         component={HomeScreen}
@@ -40,6 +46,8 @@ export function BottomStack() {
           tabBarIcon: () => <Icon name="home" size={20} color="#000" />,
         }}
       />
+
+      {/* Search Screen */}
       <Tab.Screen
         name="Search"
         component={SearchScreen}
@@ -47,21 +55,27 @@ export function BottomStack() {
           tabBarIcon: () => <Icon name="search" size={20} color="#000" />,
         }}
       />
-      <Tab.Screen
-        name="AddArt"
-        component={AddArtScreen}
-        options={{
-          tabBarLabel: '',
-          tabBarLabelStyle: {
-            marginBottom: 0,
-          },
-          tabBarIcon: () => (
-            <View className="bg-primary p-3 rounded-full">
-              <Icon name="plus" size={20} color="#fff" />
-            </View>
-          ),
-        }}
-      />
+
+      {/* AddArt Screen - Only if role is ARTIST */}
+      {role === 'ARTIST' && (
+        <Tab.Screen
+          name="AddArt"
+          component={AddArtScreen}
+          options={{
+            tabBarLabel: '',
+            tabBarLabelStyle: {
+              marginBottom: 0,
+            },
+            tabBarIcon: () => (
+              <View className="bg-primary p-3 rounded-full">
+                <Icon name="plus" size={20} color="#fff" />
+              </View>
+            ),
+          }}
+        />
+      )}
+
+      {/* Favorites Screen */}
       <Tab.Screen
         name="Favorites"
         component={FavoritesScreen}
@@ -69,6 +83,8 @@ export function BottomStack() {
           tabBarIcon: () => <Icon name="heart" size={20} color="#000" />,
         }}
       />
+
+      {/* Profile Screen */}
       <Tab.Screen
         name="Profile"
         component={UserProfile}

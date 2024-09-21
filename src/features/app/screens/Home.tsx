@@ -30,7 +30,7 @@ type ArtItem = {
 export function HomeScreen() {
   const [art, setArt] = useState<ArtItem[]>([]); // Type inferred for art
   const [isLoading, setIsLoading] = useState(true);
-  const [token, setToken] = useState<string | null>(null);
+  const [userToken, setToken] = useState<string | null>(null);
 
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const cart = useSelector(selectCart);
@@ -54,12 +54,9 @@ export function HomeScreen() {
       },
     };
 
-    console.log('Request config:', config);
-
     try {
       const response = await axios(config);
       setArt(response.data);
-      console.log('Art data:', response.data);
     } catch (error) {
       console.log('Error fetching art:', error);
     } finally {
@@ -73,7 +70,6 @@ export function HomeScreen() {
       setIsLoading(true);
       try {
         const storedToken = await AsyncStorage.getItem('@access_token');
-        console.log('Token retrieved from AsyncStorage:', storedToken); // Log the token when retrieved from AsyncStorage
         if (storedToken) {
           setToken(storedToken);
           await getArt(storedToken);
@@ -117,18 +113,18 @@ export function HomeScreen() {
         <FlatList
           data={art}
           numColumns={2}
-          columnWrapperStyle={{ gap: 8 }} // Adjust the spacing
-          renderItem={({ item }) => (
+          columnWrapperStyle={{gap: 8}} // Adjust the spacing
+          renderItem={({item}) => (
             <ArtCard
               name={item.art_name}
               artist={item.artist}
               price={item.price}
               image={item.image}
-              onPress={() => navigation.navigate('Art', { data: item })}
+              onPress={() => navigation.navigate('Art', {data: item})}
             />
           )}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingVertical: 20, paddingHorizontal: 0 }} // Optional padding for overall list
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={{paddingVertical: 20, paddingHorizontal: 0}} // Optional padding for overall list
         />
       </View>
     </AppLayout>

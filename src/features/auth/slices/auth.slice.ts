@@ -1,4 +1,6 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {RootState} from '../../../utlis/store';
+import {useSelector} from 'react-redux';
 
 export interface UserState {
   isLoggedIn: boolean;
@@ -18,7 +20,7 @@ export const authSlice = createSlice({
   name: 'userAuth',
   initialState,
   reducers: {
-    setSignIn: (state, action) => {
+    setSignIn: (state, action: PayloadAction<UserState>) => {
       state.email = action.payload.email;
       state.isLoggedIn = action.payload.isLoggedIn;
       state.name = action.payload.name;
@@ -35,13 +37,13 @@ export const authSlice = createSlice({
 
 export const {setSignIn, setSignOut} = authSlice.actions;
 
-export const selectIsLoggedIn = (state: {userAuth: {isLoggedIn: any}}) =>
-  state.userAuth.isLoggedIn;
-export const selectEmail = (state: {userAuth: {email: any}}) =>
-  state.userAuth.email;
-export const selectName = (state: {userAuth: {name: any}}) =>
-  state.userAuth.name;
-export const selectRole = (state: {userAuth: {role: any}}) =>
-  state.userAuth.role;
+export const selectIsLoggedIn = (state: RootState) => state.userAuth.isLoggedIn;
+export const selectEmail = (state: RootState) => state.userAuth.email;
+export const selectName = (state: RootState) => state.userAuth.name;
+export const selectRole = (state: RootState) => state.userAuth.role;
+
+export const useUserAuth = () => {
+  return useSelector((state: RootState) => state.userAuth);
+};
 
 export default authSlice.reducer;
