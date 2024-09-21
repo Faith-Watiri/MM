@@ -18,12 +18,18 @@ type ArtCardProps = {
   onPress: () => void;
 };
 
-export default function ArtCard({name, price, image, artist, onPress}: ArtCardProps) {
+export default function ArtCard({
+  name,
+  price,
+  image,
+  artist,
+  onPress,
+}: ArtCardProps) {
   return (
     <TouchableOpacity onPress={onPress} className="mb-5 w-1/2">
       {/* Image with Blur and Black Overlay */}
       <ImageBackground
-        source={{ uri: image }}
+        source={{uri: image}}
         className="relative h-44 w-full rounded-lg overflow-hidden"
         blurRadius={1} // Add blur effect
       >
@@ -45,7 +51,9 @@ export default function ArtCard({name, price, image, artist, onPress}: ArtCardPr
         <View>
           <Text className="text-tertiary font-bold text-[16px]">{name}</Text>
           <Text className="text-tertiary font-light text-[12px]">{artist}</Text>
-          <Text className="text-tertiary font-semibold text-[13px]">KES {price}</Text>
+          <Text className="text-tertiary font-semibold text-[13px]">
+            KES {price}
+          </Text>
         </View>
         <TouchableHighlight className="p-1 h-6 w-8 items-center justify-center rounded-full">
           <DotMenu name="dots-horizontal" size={15} color="black" />

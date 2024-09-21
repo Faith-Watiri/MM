@@ -8,11 +8,31 @@ import Digital from '../../../../assets/digital.jpg';
 import {useNavigation} from '@react-navigation/native';
 import {PrimaryButton} from '../../../../components';
 import LogoutIcon from 'react-native-vector-icons/SimpleLineIcons';
-import {useUserAuth} from '../../../auth/slices/auth.slice'; // Imported SimpleLineIcons for Logout
+import {setSignOut, useUserAuth} from '../../../auth/slices/auth.slice';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {useDispatch} from 'react-redux'; // Imported SimpleLineIcons for Logout
+
+type RootStackParamList = {
+  UserProfile: undefined;
+  Account: undefined;
+  Favorites: undefined;
+  Collection: undefined;
+  Orders: undefined;
+  Cart: undefined;
+  GiftCard: undefined;
+  Chat: undefined;
+  Settings: undefined;
+};
+
+type UserProfileScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'UserProfile'
+>;
 
 export function UserProfile() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<UserProfileScreenNavigationProp>();
   const {name, email, role} = useUserAuth();
+  const dispatch = useDispatch();
 
   const settingsData = [
     {
@@ -113,7 +133,10 @@ export function UserProfile() {
               )}
               <Text className="text-tertiary text-lg ml-2">{item.name}</Text>
             </View>
-            <TouchableHighlight onPress={() => navigation.navigate(item.route)}>
+            <TouchableHighlight
+              onPress={() =>
+                navigation.navigate(item.route as keyof RootStackParamList)
+              }>
               <FeatherIcon name="chevron-right" size={24} color="black" />
             </TouchableHighlight>
           </View>
@@ -131,11 +154,7 @@ export function UserProfile() {
             // Remove only the access token, not the entire storage
             await AsyncStorage.clear();
 
-            // Navigate to Login screen after resetting the navigation stack
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'Login'}],
-            });
+            dispatch(setSignOut());
           }}>
           <View className="flex-row items-center justify-center mt-2">
             <LogoutIcon name="logout" size={24} color="black" />

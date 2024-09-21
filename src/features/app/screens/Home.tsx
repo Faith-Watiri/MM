@@ -7,7 +7,7 @@ import {BASE_URL} from '../../../lib/constants';
 import ArtCard from '../../../components/Elements/Cards/ArtCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Loading} from '../../../components';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {selectCart} from '../../cart/slices/cart.slice';
 import axios from 'axios';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -31,6 +31,7 @@ export function HomeScreen() {
   const [art, setArt] = useState<ArtItem[]>([]); // Type inferred for art
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setToken] = useState<string | null>(null);
+  const dispatch = useDispatch();
 
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const cart = useSelector(selectCart);

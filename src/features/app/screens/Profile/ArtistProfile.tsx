@@ -82,13 +82,13 @@ export function ProfileScreen() {
 
         {/* Art */}
 
-        <FlatList
-          data={art}
-          numColumns={2}
-          renderItem={() => <ArtCard />}
-          keyExtractor={item => item.toString()}
-          className="py-5 space-x-3 px-auto"
-        />
+        {/*<FlatList*/}
+        {/*  data={art}*/}
+        {/*  numColumns={2}*/}
+        {/*  renderItem={() => <ArtCard  artist="" image=""} name={}/>}*/}
+        {/*  keyExtractor={item => item.toString()}*/}
+        {/*  className="py-5 space-x-3 px-auto"*/}
+        {/*/>*/}
       </View>
     </AppLayout>
   );

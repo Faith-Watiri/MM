@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {View, Text, Image, TouchableOpacity, ToastAndroid} from 'react-native';
 import React from 'react';
 import {AppLayout} from '../../components';
@@ -7,7 +6,7 @@ import Icon from 'react-native-vector-icons/Entypo';
 import Icon2 from 'react-native-vector-icons/Feather';
 import {useDispatch} from 'react-redux';
 import {addToCart} from '../../../cart/slices/cart.slice';
-import {useNavigation, NavigationProp} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 
 type RootStackParamList = {

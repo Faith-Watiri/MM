@@ -1,23 +1,23 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable react/no-unstable-nested-components */
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
 import {
   AddArtScreen,
   HomeScreen,
+  ProfileScreen,
   SearchScreen,
 } from '../features/app';
-import { View } from 'react-native';
+import {View} from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 import FavoritesScreen from '../features/app/screens/Art/Favorites';
-import { UserProfile } from '../features/app';
-import { useUserAuth } from '../features/auth/slices/auth.slice';
+import {UserProfile} from '../features/app';
+import {useUserAuth} from '../features/auth/slices/auth.slice';
 
 const Tab = createBottomTabNavigator();
 
 export function BottomStack() {
-  const { role } = useUserAuth();
+  const {role} = useUserAuth();
 
   console.log('Role: ', role);
 
@@ -37,7 +37,6 @@ export function BottomStack() {
         },
         headerShown: false,
       }}>
-
       {/* Home Screen */}
       <Tab.Screen
         name="Home"
@@ -87,7 +86,7 @@ export function BottomStack() {
       {/* Profile Screen */}
       <Tab.Screen
         name="Profile"
-        component={UserProfile}
+        component={role === 'ARTIST' ? ProfileScreen : UserProfile}
         options={{
           tabBarIcon: () => <Icon name="user" size={20} color="#000" />,
         }}
