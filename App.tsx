@@ -16,9 +16,9 @@ const AppContent = () => {
     <NavigationContainer>
       <StripeProvider publishableKey="pk_test_51N41wCKvbhlMKkRFilEcEs3gF0FhFXA4df4vKJGhUpuPQGhNAscwUuuZNOpfCcwsdXtY9x02Ygm3krayWsJftZdX00IL8Mhy5W">
         <StatusBar
-          barStyle="dark-content"
+          barStyle="light-content"
           animated={true}
-          backgroundColor="#FFFAF8"
+          backgroundColor="#6F3744"
         />
         {/* Check if user is logged in and navigate accordingly */}
         {isLoggedIn ? <AppStack /> : <AuthStack />}

@@ -47,29 +47,21 @@ export function BottomStack() {
       />
 
       {/* Search Screen */}
-      <Tab.Screen
-        name="Search"
-        component={SearchScreen}
-        options={{
-          tabBarIcon: () => <Icon name="search" size={20} color="#000" />,
-        }}
-      />
+      {/*<Tab.Screen*/}
+      {/*  name="Search"*/}
+      {/*  component={SearchScreen}*/}
+      {/*  options={{*/}
+      {/*    tabBarIcon: () => <Icon name="search" size={20} color="#000" />,*/}
+      {/*  }}*/}
+      {/*/>*/}
 
       {/* AddArt Screen - Only if role is ARTIST */}
       {role === 'ARTIST' && (
         <Tab.Screen
-          name="AddArt"
+          name="Create"
           component={AddArtScreen}
           options={{
-            tabBarLabel: '',
-            tabBarLabelStyle: {
-              marginBottom: 0,
-            },
-            tabBarIcon: () => (
-              <View className="bg-primary p-3 rounded-full">
-                <Icon name="plus" size={20} color="#fff" />
-              </View>
-            ),
+            tabBarIcon: () => <Icon name="plus" size={20} color="#000" />,
           }}
         />
       )}

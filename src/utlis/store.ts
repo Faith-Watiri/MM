@@ -13,6 +13,7 @@ import {
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import cartSlice from '../features/cart/slices/cart.slice';
+import favoritesSlice from '../features/app/screens/Art/slices/favorites.slice';
 
 const persistConfig = {
   key: 'root',
@@ -25,6 +26,7 @@ export const store = configureStore({
   reducer: {
     userAuth: persistedReducer,
     cart: cartSlice,
+    favorites: favoritesSlice,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

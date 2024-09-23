@@ -11,6 +11,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {selectCart} from '../../cart/slices/cart.slice';
 import axios from 'axios';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {useUserAuth} from '../../auth/slices/auth.slice';
 
 type RootStackParamList = {
   Cart: undefined;
@@ -19,7 +20,7 @@ type RootStackParamList = {
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Art'>;
 
-type ArtItem = {
+export type ArtItem = {
   id: number;
   art_name: string;
   artist: string;
@@ -32,6 +33,7 @@ export function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setToken] = useState<string | null>(null);
   const dispatch = useDispatch();
+  const {name} = useUserAuth();
 
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const cart = useSelector(selectCart);
@@ -93,10 +95,16 @@ export function HomeScreen() {
     <AppLayout>
       {/* ArtWork Header */}
       <View>
-        <View className="flex-row mt-5 items-center justify-between">
-          <Text className="text-tertiary text-[25px] font-semibold">
-            Art Gallery
-          </Text>
+        <View className="flex-row mt-2 items-center justify-between">
+          <View className="">
+            <Text className="text-tertiary text-[24px] font-semibold">
+              Art Gallery
+            </Text>
+            <Text>
+              Welcome back,{' '}
+              <Text className="text-primary font-bold">{name}</Text>
+            </Text>
+          </View>
 
           <TouchableHighlight
             onPress={() => navigation.navigate('Cart')}

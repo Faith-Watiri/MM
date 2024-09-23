@@ -1,11 +1,11 @@
 import {
-  View,
+  Image,
+  Platform,
+  ScrollView,
   Text,
   ToastAndroid,
-  Image,
-  ScrollView,
   TouchableOpacity,
-  Platform,
+  View,
 } from 'react-native';
 import React, {useState} from 'react';
 import {AppLayout} from '../../components';
@@ -203,18 +203,21 @@ export function AddArtScreen() {
 
   return (
     <AppLayout>
+      <View className="my-2 justify-center w-full">
+        <Text className="text-black text-[24px] text-center font-semibold">Add your Art Piece</Text>
+      </View>
       <ScrollView showsVerticalScrollIndicator={false} className="my-5">
         {/* Image upload preview */}
         <TouchableOpacity onPress={selectImage}>
-          <View className="border-primary border-2 w-full h-48 rounded-lg items-center justify-center">
+          <View className="border-gray-400 border-dotted border-[.5px] w-full h-32 rounded-lg items-center justify-center">
             {imageUri ? (
               <Image
                 source={{uri: imageUri}}
                 className="w-full h-full rounded-lg"
               />
             ) : (
-              <View>
-                <Icon name="upload" size={30} color="#6F3744" />
+              <View className="items-center space-y-2">
+                <Icon name="upload" size={24} color="#6F3744" />
                 <Text className="text-primary font-semibold">
                   Upload an Image
                 </Text>

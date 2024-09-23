@@ -19,6 +19,7 @@ export function AppLayout({children}: AppLayoutProps) {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'relative',
     width: width, // Full screen width
     height: height, // Full screen height
     backgroundColor: '#FFFAF8', // Adjust the color as needed or use 'bg-secondary'

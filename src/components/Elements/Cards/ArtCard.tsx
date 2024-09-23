@@ -3,22 +3,21 @@ import {
   ImageBackground,
   Text,
   ToastAndroid,
-  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Feather';
-import DotMenu from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useDispatch} from 'react-redux';
 import {addToCart} from '../../../features/cart/slices/cart.slice';
+import {addToFavorites} from '../../../features/app/screens/Art/slices/favorites.slice';
 
 type ArtCardProps = {
   name: string;
-  price: number;
+  price?: number;
   image: string;
   artist: string;
-  onPress: () => void;
+  onPress?: () => void;
 };
 
 export default function ArtCard({
@@ -53,10 +52,28 @@ export default function ArtCard({
     );
   };
 
+  const handleAddToFavorites = () => {
+    const favoriteItem = {
+      id: Math.random(), // Replace with unique ID from your data
+      name: name,
+      photo: image,
+    };
+
+    dispatch(addToFavorites(favoriteItem));
+
+    ToastAndroid.showWithGravityAndOffset(
+      'Added to favorites!',
+      ToastAndroid.BOTTOM,
+      ToastAndroid.LONG,
+      25,
+      50,
+    );
+  };
+
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={{marginBottom: 20, width: cardWidth}}>
+      style={{marginBottom: 0, width: cardWidth}}>
       {/* Image with Blur and Black Overlay */}
       <ImageBackground
         source={{uri: image}}
@@ -90,10 +107,14 @@ export default function ArtCard({
             gap: 10,
             zIndex: 20,
           }}>
+          {/* Dispatch addToFavorites when heart icon is pressed */}
           <TouchableOpacity
+            onPress={handleAddToFavorites}
             style={{padding: 6, backgroundColor: 'white', borderRadius: 20}}>
             <Icon name="heart" size={14} color="#6F3744" />
           </TouchableOpacity>
+
+          {/* Dispatch addToCart when shopping-cart icon is pressed */}
           <TouchableOpacity
             onPress={handleAddToCart}
             style={{padding: 6, backgroundColor: 'white', borderRadius: 20}}>
@@ -114,22 +135,26 @@ export default function ArtCard({
           <Text style={{color: '#6F3744', fontWeight: 'bold', fontSize: 16}}>
             {name}
           </Text>
-          <Text style={{color: '#6F3744', fontSize: 12}}>{artist}</Text>
-          <Text style={{color: '#6F3744', fontWeight: '600', fontSize: 13}}>
-            KES {price}
-          </Text>
+          {artist && (
+            <Text style={{color: '#6F3744', fontSize: 12}}>{artist}</Text>
+          )}
+          {price && (
+            <Text style={{color: '#6F3744', fontWeight: '600', fontSize: 13}}>
+              KES {price}
+            </Text>
+          )}
         </View>
-        <TouchableHighlight
-          style={{
-            padding: 5,
-            height: 24,
-            width: 24,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 12,
-          }}>
-          <DotMenu name="dots-horizontal" size={15} color="black" />
-        </TouchableHighlight>
+        {/*<TouchableHighlight*/}
+        {/*  style={{*/}
+        {/*    padding: 5,*/}
+        {/*    height: 24,*/}
+        {/*    width: 24,*/}
+        {/*    justifyContent: 'center',*/}
+        {/*    alignItems: 'center',*/}
+        {/*    borderRadius: 12,*/}
+        {/*  }}>*/}
+        {/*  <DotMenu name="dots-horizontal" size={15} color="black" />*/}
+        {/*</TouchableHighlight>*/}
       </View>
     </TouchableOpacity>
   );

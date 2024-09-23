@@ -1,19 +1,18 @@
-import {FlatList, Image, Text, TouchableHighlight, View} from 'react-native';
+import {FlatList, Text, TouchableHighlight, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {AppLayout} from '../../components';
 import Icon from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/EvilIcons';
 import {useNavigation} from '@react-navigation/native';
-import Digital from '../../../../assets/digital.jpg';
-import {Loading, PrimaryButton, SecondaryButton} from '../../../../components';
+import {Loading} from '../../../../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {setSignOut, useUserAuth} from '../../../auth/slices/auth.slice'; // Imported auth hooks/actions
-import LogoutIcon from 'react-native-vector-icons/SimpleLineIcons'; // Imported SimpleLineIcons for Logout
 import {BASE_URL} from '../../../../lib/constants';
 import ArtCard from '../../../../components/Elements/Cards/ArtCard';
 import {ArtItem} from '../Home';
 import {StackNavigationProp} from '@react-navigation/stack';
+import LogoutIcon from 'react-native-vector-icons/AntDesign';
 
 type RootStackParamList = {
   Cart: undefined;
@@ -35,6 +34,15 @@ export function ProfileScreen() {
   const handleLogout = async () => {
     await AsyncStorage.clear(); // Clear only the access token
     dispatch(setSignOut()); // Trigger logout action
+  };
+
+  const getInitials = (user_name: string) => {
+    const nameParts = user_name.split(' ');
+    if (nameParts.length > 1) {
+      return nameParts[0][0] + nameParts[1][0]; // Get first letter of each word
+    } else {
+      return nameParts[0][0]; // Get first letter of the single word
+    }
   };
 
   // Fetch user's art
@@ -77,8 +85,8 @@ export function ProfileScreen() {
       }
     };
 
-    fetchTokenAndArt(); // Only call this function once
-  }, [userId]); // Only run this effect when userId changes
+    fetchTokenAndArt();
+  }, [userId]);
 
   if (isLoading) {
     return <Loading />;
@@ -94,51 +102,64 @@ export function ProfileScreen() {
           color="black"
           onPress={() => navigation.goBack()}
         />
+        <TouchableHighlight onPress={handleLogout}>
+          <LogoutIcon name="logout" size={24} color="black" />
+        </TouchableHighlight>
+      </View>
 
-        <View className="items-center space-y-3">
-          <Image source={Digital} className="h-14 w-14 rounded-full" />
-          <Text className="text-primary text-4xl font-bold">{name}</Text>
-          <Text className="text-tertiary text-lg">{email}</Text>
-
-          <View className="flex-row items-center justify-around w-2/3">
-            <Icon2 name="location" color="#C9C9C9" size={20} />
-            <Text className="text-[#C9C9C9] text-lg">USA</Text>
-            <Text className="text-[#C9C9C9] text-lg">b.1970</Text>
-          </View>
+      <View className="items-center space-y-3">
+        <View
+          style={{
+            height: 56,
+            width: 56,
+            borderRadius: 28,
+            backgroundColor: '#6F3744', // Use your desired background color
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{color: 'white', fontSize: 24, fontWeight: 'bold'}}>
+            {getInitials(name)}
+          </Text>
         </View>
+        <Text className="text-primary text-[24px] font-bold">{name}</Text>
+        <Text className="text-tertiary text-[14px]">{email}</Text>
 
-        <Icon name="share-2" size={24} color="black" />
+        <View className="flex-row items-center justify-evenly w-2/3 h-auto">
+          <Icon2 name="location" color="#C9C9C9" size={20} />
+          <Text className="text-[#C9C9C9] text-sm">USA</Text>
+          <Text className="text-[#C9C9C9] text-sm">b.1970</Text>
+        </View>
       </View>
 
       {/* Stats Section */}
-      <View className="flex-row justify-around my-3">
+      <View className="flex-row justify-evenly my-2">
         <View className="items-center">
-          <Text className="text-tertiary font-bold text-xl">150</Text>
-          <Text className="text-tertiary">works</Text>
+          <Text className="text-tertiary font-bold text-lg">150</Text>
+          <Text className="text-tertiary text-xs">works</Text>
         </View>
         <View className="items-center">
-          <Text className="text-tertiary font-bold text-xl">120</Text>
-          <Text className="text-tertiary">followers</Text>
+          <Text className="text-tertiary font-bold text-lg">120</Text>
+          <Text className="text-tertiary text-xs">followers</Text>
         </View>
         <View className="items-center">
-          <Text className="text-tertiary font-bold text-xl">15</Text>
-          <Text className="text-tertiary">following</Text>
+          <Text className="text-tertiary font-bold text-lg">15</Text>
+          <Text className="text-tertiary text-xs">following</Text>
         </View>
       </View>
 
       {/* Bio Section */}
       <View className="items-center my-5 w-full">
-        <Text className="text-tertiary text-center w-64">
+        <Text className="text-tertiary text-center w-3/4">
           A passionate farce in Conceptual art John Doe transformed popp
           cultural and art historical oconography into ...
         </Text>
       </View>
 
       {/* Follow and Message Buttons */}
-      <View className="flex-row justify-around my-5" style={{width: '100%'}}>
-        <PrimaryButton name="Follow" onPress={() => {}} width={150} />
-        <SecondaryButton name="Message" onPress={() => {}} width={150} />
-      </View>
+      {/*<View className="flex-row justify-around my-5" style={{width: '100%'}}>*/}
+      {/*  <PrimaryButton name="Follow" onPress={() => {}} width={150} />*/}
+      {/*  <SecondaryButton name="Message" onPress={() => {}} width={150} />*/}
+      {/*</View>*/}
 
       {/* Artworks Section */}
       <View className="flex-row mt-5 items-center justify-between">
@@ -167,16 +188,12 @@ export function ProfileScreen() {
           />
         )}
         keyExtractor={item => item.id.toString()}
-        contentContainerStyle={{paddingVertical: 20, paddingHorizontal: 0}} // Optional padding for overall list
+        contentContainerStyle={{
+          paddingTop: 20,
+          paddingHorizontal: 0,
+          paddingBottom: 150,
+        }} // Optional padding for overall list
       />
-
-      {/* Logout Button */}
-      <TouchableHighlight className="my-2" onPress={handleLogout}>
-        <View className="flex-row items-center justify-center mt-2">
-          <LogoutIcon name="logout" size={24} color="black" />
-          <Text className="text-center ml-2">Logout</Text>
-        </View>
-      </TouchableHighlight>
     </AppLayout>
   );
 }

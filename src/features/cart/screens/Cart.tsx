@@ -1,4 +1,4 @@
-import {View, Text, Image, TouchableHighlight, ScrollView} from 'react-native';
+import {Image, ScrollView, Text, TouchableHighlight, View} from 'react-native';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
@@ -88,12 +88,12 @@ export function Cart() {
           className="rounded-full p-1">
           <Icon name="arrow-left" size={24} color="black" />
         </TouchableHighlight>
-        <Text className="text-tertiary text-center text-xl font-bold">
+        <Text className="text-tertiary text-center text-xl font-bold flex-1">
           Shopping Basket
         </Text>
       </View>
 
-      <ScrollView className="py-7">
+      <ScrollView className="py-4">
         {cart?.map((item: any) => (
           <CartItem
             key={item.id}
@@ -105,7 +105,7 @@ export function Cart() {
           />
         ))}
       </ScrollView>
-      <View className="my-10">
+      <View className="absolute bottom-[50px] px-4">
         <Text className="text-primary text-lg uppercase">Order Summary</Text>
 
         <View className="mb-2 flex-row items-center space-x-2">
@@ -116,18 +116,18 @@ export function Cart() {
             <Text className="">KES</Text> {getTotal().totalPrice}
           </Text>
         </View>
-      </View>
 
-      {getTotal().totalQuantity > 0 ? (
-        <PrimaryButton
-          name="Checkout"
-          onPress={() => navigation.navigate('Payment')}
-        />
-      ) : (
-        <Text className="text-tertiary text-center text-lg font-bold">
-          Your cart is empty
-        </Text>
-      )}
+        {getTotal().totalQuantity > 0 ? (
+          <PrimaryButton
+            name="Checkout"
+            onPress={() => navigation.navigate('Payment')}
+          />
+        ) : (
+          <Text className="text-tertiary text-center text-lg font-bold">
+            Your cart is empty
+          </Text>
+        )}
+      </View>
     </AppLayout>
   );
 }
