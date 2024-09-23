@@ -1,4 +1,4 @@
-import {View, Text, Image, TouchableOpacity, ToastAndroid} from 'react-native';
+import {Image, Text, ToastAndroid, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {AppLayout} from '../../components';
 import {PrimaryButton} from '../../../../components';
@@ -10,8 +10,8 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 
 type RootStackParamList = {
-  Cart: undefined; // No params expected for Cart
-  SingleArt: {data: any}; // Params expected for SingleArt
+  Cart: undefined;
+  SingleArt: {data: any};
 };
 
 type SingleArtScreenNavigationProp = StackNavigationProp<

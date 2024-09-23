@@ -55,9 +55,10 @@ export function Login() {
       // Save user profile data to AsyncStorage
       await AsyncStorage.setItem('@user_profile', JSON.stringify(profileData));
 
-      // Dispatch the user profile data to Redux
+      // Dispatch the user profile data to Redux, including userId
       dispatch(
         setSignIn({
+          userId: profileData.id, // Set userId in the state
           email: profileData.email,
           name: profileData.name,
           role: profileData.role,
@@ -108,6 +109,9 @@ export function Login() {
         if (decodedToken) {
           const userId = decodedToken.userId;
           console.log('Decoded userId:', userId);
+
+          // Save the userId to AsyncStorage as well (optional)
+          await AsyncStorage.setItem('@user_id', userId.toString());
 
           // Fetch user profile using the user ID from the token
           await fetchUserProfile(userId, accessToken);

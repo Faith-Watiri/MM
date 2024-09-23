@@ -1,11 +1,11 @@
-import axios from 'axios';
 import {
   View,
   Text,
-  Alert,
+  ToastAndroid,
   Image,
   ScrollView,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import React, {useState} from 'react';
 import {AppLayout} from '../../components';
@@ -14,18 +14,33 @@ import {FormInput, PrimaryButton} from '../../../../components';
 import {Asset, launchImageLibrary} from 'react-native-image-picker';
 import {BASE_URL} from '../../../../lib/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNFS from 'react-native-fs';
+import {useUserAuth} from '../../../auth/slices/auth.slice';
+
+type ArtDetails = {
+  art_name: string;
+  price: string | number;
+  size: string;
+  description: string;
+  category: string;
+  quantity: string | number;
+  image: string;
+  sold: number;
+  userId?: number; // Added userId to the type
+};
 
 export function AddArtScreen() {
+  const {userId} = useUserAuth(); // Fetch userId from useUserAuth hook
   const [imageUri, setImageUri] = useState<string | undefined>();
-  const [artDetails, setArtDetails] = useState({
+  const [artDetails, setArtDetails] = useState<ArtDetails>({
     art_name: '',
     price: '',
     size: '',
     description: '',
     category: '',
     quantity: '',
-    imageUrl: '',
-    sold: '0', // Initially 0 since the art hasn't been sold yet
+    image: '',
+    sold: 0,
   });
 
   // Function to handle image selection
@@ -36,58 +51,101 @@ export function AddArtScreen() {
     });
 
     if (result.didCancel) {
-      Alert.alert('Cancelled', 'Image selection cancelled.');
+      ToastAndroid.showWithGravity(
+        'Image selection cancelled.',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
     } else if (result.errorMessage) {
-      Alert.alert('Error', result.errorMessage);
+      ToastAndroid.showWithGravity(
+        result.errorMessage,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
     } else if (result.assets && result.assets.length > 0) {
       const selectedImage = result.assets[0]; // Safe access to the first asset
       setImageUri(selectedImage.uri); // Set image URI for preview
-      uploadImage(selectedImage); // Upload image to Cloudinary
+      await uploadImage(selectedImage); // Upload image to Cloudinary
     } else {
-      Alert.alert('Error', 'No image selected.');
+      ToastAndroid.showWithGravity(
+        'No image selected.',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
     }
   };
 
-  // Function to upload image to Cloudinary using Axios with Bearer Token
   const uploadImage = async (image: Asset) => {
+    let localImageUri = image.uri;
+
+    if (Platform.OS === 'android' && localImageUri?.startsWith('content://')) {
+      const filePath = await RNFS.stat(localImageUri);
+      localImageUri = 'file://' + filePath.path;
+    }
+
     const formData = new FormData();
     formData.append('file', {
-      uri: image.uri, // Removing 'file://' for Android compatibility
-      type: image.type,
-      name: image.fileName || 'image.jpg', // Fallback to 'image.jpg' if no filename is provided
+      uri: localImageUri,
+      type: image.type || 'image/jpeg',
+      name: image.fileName || 'image.jpg',
     });
 
-    console.log(formData);
+    const token = await AsyncStorage.getItem('@access_token');
 
-    const token = AsyncStorage.getItem('@access_token');
+    if (!token) {
+      ToastAndroid.showWithGravity(
+        'Authentication token is missing.',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
+      return;
+    }
 
     try {
-      console.log('Uploading image with formData:', formData);
-      const response = await axios.post(
-        `${BASE_URL}/img-upload/upload`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${BASE_URL}/img-upload/upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
-      console.log('Upload response:', response);
-    } catch (error) {
-      console.error('Error details:', error);
-      if (error.response) {
-        console.error('Error response data:', error.response.data);
-        console.error('Error response status:', error.response.status);
+        body: formData,
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        ToastAndroid.showWithGravity(
+          'Image uploaded successfully!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+        );
+        setArtDetails(prev => ({
+          ...prev,
+          image: responseData.secure_url, // Assuming 'secure_url' is returned
+        }));
+      } else {
+        ToastAndroid.showWithGravity(
+          responseData.message || 'Failed to upload image.',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+        );
       }
-      Alert.alert('Error', 'Failed to upload image.');
+    } catch (error) {
+      ToastAndroid.showWithGravity(
+        'Failed to upload image.',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
     }
   };
 
   // Function to handle form submission
   const postArt = async () => {
-    if (!artDetails.imageUrl) {
-      Alert.alert('Missing Image', 'Please upload an image first.');
+    if (!artDetails.image) {
+      ToastAndroid.showWithGravity(
+        'Please upload an image first.',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
       return;
     }
 
@@ -95,31 +153,51 @@ export function AddArtScreen() {
       const token = await AsyncStorage.getItem('@access_token');
 
       if (!token) {
-        Alert.alert('Error', 'Authentication token is missing.');
+        ToastAndroid.showWithGravity(
+          'Authentication token is missing.',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+        );
         return;
       }
 
-      const response = await axios.post(
-        `${BASE_URL}/arts`,
-        artDetails, // Send all the details
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      // Include userId in art details
+      const artData = {
+        ...artDetails,
+        userId: userId, // Add userId to the art details
+      };
 
-      if (response.status === 201) {
-        Alert.alert('Success', 'Art submitted successfully');
+      // Send the art details using fetch
+      const response = await fetch(`${BASE_URL}/art`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(artData), // Send art details along with userId as JSON
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        ToastAndroid.showWithGravity(
+          'Art submitted successfully!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+        );
       } else {
-        Alert.alert(
-          'Submission Failed',
-          response.data.message || 'Something went wrong.',
+        ToastAndroid.showWithGravity(
+          responseData.message || 'Something went wrong.',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
         );
       }
-    } catch (error: unknown) {
-      console.error(error); // Log the error for debugging
-      Alert.alert('Error', 'Failed to submit art.');
+    } catch (error) {
+      ToastAndroid.showWithGravity(
+        'Failed to submit art.',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
     }
   };
 
@@ -157,8 +235,15 @@ export function AddArtScreen() {
           <FormInput
             label="Price"
             keyboardType="numeric"
-            value={artDetails.price}
-            onChangeText={text => setArtDetails({...artDetails, price: text})}
+            value={String(artDetails.price)}
+            onChangeText={text => {
+              const parsedPrice = parseFloat(text);
+              if (!isNaN(parsedPrice)) {
+                setArtDetails({...artDetails, price: parsedPrice});
+              } else {
+                setArtDetails({...artDetails, price: ''});
+              }
+            }}
           />
           <FormInput
             label="Size"
@@ -182,10 +267,15 @@ export function AddArtScreen() {
           <FormInput
             label="Quantity"
             keyboardType="numeric"
-            value={artDetails.quantity}
-            onChangeText={text =>
-              setArtDetails({...artDetails, quantity: text})
-            }
+            value={String(artDetails.quantity)}
+            onChangeText={text => {
+              const parsedQuantity = parseInt(text, 10);
+              if (!isNaN(parsedQuantity)) {
+                setArtDetails({...artDetails, quantity: parsedQuantity});
+              } else {
+                setArtDetails({...artDetails, quantity: ''});
+              }
+            }}
           />
         </View>
 

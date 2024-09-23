@@ -7,6 +7,7 @@ export interface UserState {
   role: string;
   email: string;
   name: string;
+  userId: number;
 }
 
 const initialState: UserState = {
@@ -14,6 +15,7 @@ const initialState: UserState = {
   email: '',
   name: '',
   role: '',
+  userId: 0,
 };
 
 export const authSlice = createSlice({
@@ -25,11 +27,13 @@ export const authSlice = createSlice({
       state.isLoggedIn = action.payload.isLoggedIn;
       state.name = action.payload.name;
       state.role = action.payload.role;
+      state.userId = action.payload.userId;
     },
     setSignOut: state => {
       state.email = '';
       state.name = '';
       state.role = '';
+      state.userId = 0;
       state.isLoggedIn = false;
     },
   },

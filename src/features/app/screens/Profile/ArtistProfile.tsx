@@ -1,29 +1,44 @@
-/* eslint-disable react-native/no-inline-styles */
-import {View, Text, Image, FlatList} from 'react-native';
-import React, {useState} from 'react';
+import {Image, Text, TouchableHighlight, View} from 'react-native';
+import React from 'react';
 import {AppLayout} from '../../components';
 import Icon from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/EvilIcons';
-
+import {useNavigation} from '@react-navigation/native';
 import Digital from '../../../../assets/digital.jpg';
 import {PrimaryButton, SecondaryButton} from '../../../../components';
-import ArtCard from '../../../../components/Elements/Cards/ArtCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
+import {setSignOut, useUserAuth} from '../../../auth/slices/auth.slice'; // Imported auth hooks/actions
+import LogoutIcon from 'react-native-vector-icons/SimpleLineIcons'; // Imported SimpleLineIcons for Logout
 
 export function ProfileScreen() {
-  const [art, setArt] = useState([{}, {}, {}, {}, {}, {}, {}]);
+  const {name, email} = useUserAuth(); // Get user profile info
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const handleLogout = async () => {
+    await AsyncStorage.clear(); // Clear only the access token
+    dispatch(setSignOut()); // Trigger logout action
+  };
+
   return (
     <AppLayout>
       {/* Top header */}
       <View className="flex-row justify-between">
-        <Icon name="arrow-left" size={24} color="black" />
+        <Icon
+          name="arrow-left"
+          size={24}
+          color="black"
+          onPress={() => navigation.goBack()}
+        />
 
         <View className="items-center space-y-3">
           <Image source={Digital} className="h-14 w-14 rounded-full" />
-          <Text className="text-primary text-4xl font-bold">John Doe</Text>
+          <Text className="text-primary text-4xl font-bold">{name}</Text>
+          <Text className="text-tertiary text-lg">{email}</Text>
 
           <View className="flex-row items-center justify-around w-2/3">
             <Icon2 name="location" color="#C9C9C9" size={20} />
-
             <Text className="text-[#C9C9C9] text-lg">USA</Text>
             <Text className="text-[#C9C9C9] text-lg">b.1970</Text>
           </View>
@@ -32,64 +47,63 @@ export function ProfileScreen() {
         <Icon name="share-2" size={24} color="black" />
       </View>
 
-      <View>
-        <View className="flex-row justify-around my-3">
-          {/* Stats */}
-          <View className="items-center">
-            <Text className="text-tertiary font-bold text-xl">150</Text>
-            <Text className="text-tertiary">works</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-tertiary font-bold text-xl">120</Text>
-            <Text className="text-tertiary">followers</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-tertiary font-bold text-xl">15</Text>
-            <Text className="text-tertiary">following</Text>
-          </View>
+      {/* Stats Section */}
+      <View className="flex-row justify-around my-3">
+        <View className="items-center">
+          <Text className="text-tertiary font-bold text-xl">150</Text>
+          <Text className="text-tertiary">works</Text>
         </View>
-
-        {/* Bio */}
-        <View className="items-center my-5 w-full">
-          <Text className="text-tertiary text-center w-64">
-            A passionate farce in Conceptual art John Doe transformed popp
-            cultural and art historical oconography into ...
-          </Text>
+        <View className="items-center">
+          <Text className="text-tertiary font-bold text-xl">120</Text>
+          <Text className="text-tertiary">followers</Text>
+        </View>
+        <View className="items-center">
+          <Text className="text-tertiary font-bold text-xl">15</Text>
+          <Text className="text-tertiary">following</Text>
         </View>
       </View>
 
-      <View
-        className="flex-row flex- my-5 justify-around"
-        style={{
-          width: '100%',
-        }}>
-        <PrimaryButton name="Followed" onPress={() => {}} width={150} />
+      {/* Bio Section */}
+      <View className="items-center my-5 w-full">
+        <Text className="text-tertiary text-center w-64">
+          A passionate farce in Conceptual art John Doe transformed popp
+          cultural and art historical oconography into ...
+        </Text>
+      </View>
+
+      {/* Follow and Message Buttons */}
+      <View className="flex-row justify-around my-5" style={{width: '100%'}}>
+        <PrimaryButton name="Follow" onPress={() => {}} width={150} />
         <SecondaryButton name="Message" onPress={() => {}} width={150} />
       </View>
 
-      {/* ArtWork */}
-      <View className="">
-        <View className="flex-row mt-5 items-center justify-between">
-          <Text className="text-tertiary text-[25px] font-semibold">
-            Artworks
-          </Text>
-
-          <Text className="text-tertiary text-[16px] items-center justify-center">
-            <Icon name="filter" size={24} color={'black'} />
-            Filters
-          </Text>
-        </View>
-
-        {/* Art */}
-
-        {/*<FlatList*/}
-        {/*  data={art}*/}
-        {/*  numColumns={2}*/}
-        {/*  renderItem={() => <ArtCard  artist="" image=""} name={}/>}*/}
-        {/*  keyExtractor={item => item.toString()}*/}
-        {/*  className="py-5 space-x-3 px-auto"*/}
-        {/*/>*/}
+      {/* Artworks Section */}
+      <View className="flex-row mt-5 items-center justify-between">
+        <Text className="text-tertiary text-[25px] font-semibold">
+          Artworks
+        </Text>
+        <Text className="text-tertiary text-[16px] items-center justify-center">
+          <Icon name="filter" size={24} color={'black'} />
+          Filters
+        </Text>
       </View>
+
+      {/* Render Artwork (assuming you have art data) */}
+      {/* <FlatList
+        data={art}
+        numColumns={2}
+        renderItem={({ item }) => <ArtCard artist={item.artist} image={item.image} />}
+        keyExtractor={(item, index) => index.toString()}
+        className="py-5 space-x-3 px-auto"
+      /> */}
+
+      {/* Logout Button */}
+      <TouchableHighlight className="my-2" onPress={handleLogout}>
+        <View className="flex-row items-center justify-center mt-2">
+          <LogoutIcon name="logout" size={24} color="black" />
+          <Text className="text-center ml-2">Logout</Text>
+        </View>
+      </TouchableHighlight>
     </AppLayout>
   );
 }
