@@ -1,4 +1,4 @@
-import {View, Text, FlatList, TouchableHighlight} from 'react-native';
+import {FlatList, Text, TouchableHighlight, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {AppLayout} from '../components';
 import Icon from 'react-native-vector-icons/Feather';
@@ -94,7 +94,9 @@ export function HomeScreen() {
       {/* ArtWork Header */}
       <View>
         <View className="flex-row mt-5 items-center justify-between">
-          <Text className="text-tertiary text-[25px] font-semibold">Art</Text>
+          <Text className="text-tertiary text-[25px] font-semibold">
+            Art Gallery
+          </Text>
 
           <TouchableHighlight
             onPress={() => navigation.navigate('Cart')}
@@ -114,6 +116,7 @@ export function HomeScreen() {
         <FlatList
           data={art}
           numColumns={2}
+          showsVerticalScrollIndicator={false}
           columnWrapperStyle={{gap: 8}} // Adjust the spacing
           renderItem={({item}) => (
             <ArtCard
@@ -125,7 +128,11 @@ export function HomeScreen() {
             />
           )}
           keyExtractor={item => item.id.toString()}
-          contentContainerStyle={{paddingVertical: 20, paddingHorizontal: 0}} // Optional padding for overall list
+          contentContainerStyle={{
+            paddingTop: 20,
+            paddingHorizontal: 8,
+            paddingBottom: 150,
+          }} // Optional padding for overall list
         />
       </View>
     </AppLayout>

@@ -1,25 +1,88 @@
-import {Image, Text, TouchableHighlight, View} from 'react-native';
-import React from 'react';
+import {FlatList, Image, Text, TouchableHighlight, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {AppLayout} from '../../components';
 import Icon from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/EvilIcons';
 import {useNavigation} from '@react-navigation/native';
 import Digital from '../../../../assets/digital.jpg';
-import {PrimaryButton, SecondaryButton} from '../../../../components';
+import {Loading, PrimaryButton, SecondaryButton} from '../../../../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {setSignOut, useUserAuth} from '../../../auth/slices/auth.slice'; // Imported auth hooks/actions
 import LogoutIcon from 'react-native-vector-icons/SimpleLineIcons'; // Imported SimpleLineIcons for Logout
+import {BASE_URL} from '../../../../lib/constants';
+import ArtCard from '../../../../components/Elements/Cards/ArtCard';
+import {ArtItem} from '../Home';
+import {StackNavigationProp} from '@react-navigation/stack';
+
+type RootStackParamList = {
+  Cart: undefined;
+  Art: {data: ArtItem};
+};
+
+type ArtProfileScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'Art'
+>;
 
 export function ProfileScreen() {
-  const {name, email} = useUserAuth(); // Get user profile info
+  const {name, email, userId} = useUserAuth(); // Get user profile info
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<ArtProfileScreenNavigationProp>();
+  const [art, setArt] = useState<ArtItem[]>([]); // State to hold user's artworks
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleLogout = async () => {
     await AsyncStorage.clear(); // Clear only the access token
     dispatch(setSignOut()); // Trigger logout action
   };
+
+  // Fetch user's art
+  const getUserArt = async (token: string) => {
+    const url = `${BASE_URL}/art/user/${userId}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error fetching user art: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setArt(data); // Set the fetched art data
+    } catch (error) {
+      console.log('Error fetching user art:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch token and user's art on component mount
+  useEffect(() => {
+    const fetchTokenAndArt = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem('@access_token');
+        if (storedToken) {
+          await getUserArt(storedToken);
+        } else {
+          console.log('No token found in AsyncStorage');
+        }
+      } catch (error) {
+        console.log('Error fetching token or user art:', error);
+      }
+    };
+
+    fetchTokenAndArt(); // Only call this function once
+  }, [userId]); // Only run this effect when userId changes
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <AppLayout>
@@ -88,14 +151,24 @@ export function ProfileScreen() {
         </Text>
       </View>
 
-      {/* Render Artwork (assuming you have art data) */}
-      {/* <FlatList
+      {/* Render User's Artworks */}
+      <FlatList
         data={art}
+        showsVerticalScrollIndicator={false}
         numColumns={2}
-        renderItem={({ item }) => <ArtCard artist={item.artist} image={item.image} />}
-        keyExtractor={(item, index) => index.toString()}
-        className="py-5 space-x-3 px-auto"
-      /> */}
+        columnWrapperStyle={{gap: 8}} // Adjust the spacing
+        renderItem={({item}: {item: ArtItem}) => (
+          <ArtCard
+            name={item.art_name}
+            artist={name}
+            price={item.price}
+            image={item.image}
+            onPress={() => navigation.navigate('Art', {data: item})}
+          />
+        )}
+        keyExtractor={item => item.id.toString()}
+        contentContainerStyle={{paddingVertical: 20, paddingHorizontal: 0}} // Optional padding for overall list
+      />
 
       {/* Logout Button */}
       <TouchableHighlight className="my-2" onPress={handleLogout}>

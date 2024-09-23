@@ -1,18 +1,21 @@
 import {
-  View,
-  Text,
-  TouchableOpacity,
+  Dimensions,
   ImageBackground,
+  Text,
+  ToastAndroid,
   TouchableHighlight,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import DotMenu from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Float} from 'react-native/Libraries/Types/CodegenTypes';
+import {useDispatch} from 'react-redux';
+import {addToCart} from '../../../features/cart/slices/cart.slice';
 
 type ArtCardProps = {
   name: string;
-  price: Float;
+  price: number;
   image: string;
   artist: string;
   onPress: () => void;
@@ -25,37 +28,106 @@ export default function ArtCard({
   artist,
   onPress,
 }: ArtCardProps) {
+  const screenWidth = Dimensions.get('window').width;
+  const cardWidth = screenWidth / 2 - 28;
+  const dispatch = useDispatch();
+
+  const handleAddToCart = () => {
+    const cartItem = {
+      id: Math.random(), // You should replace this with a unique item ID from your data
+      name: name,
+      price: price,
+      image: image,
+      artist: artist,
+      quantity: 1,
+    };
+
+    dispatch(addToCart(cartItem));
+
+    ToastAndroid.showWithGravityAndOffset(
+      'Added to cart successfully!',
+      ToastAndroid.BOTTOM,
+      ToastAndroid.LONG,
+      25,
+      50,
+    );
+  };
+
   return (
-    <TouchableOpacity onPress={onPress} className="mb-5 w-1/2">
+    <TouchableOpacity
+      onPress={onPress}
+      style={{marginBottom: 20, width: cardWidth}}>
       {/* Image with Blur and Black Overlay */}
       <ImageBackground
         source={{uri: image}}
-        className="relative h-44 w-full rounded-lg overflow-hidden"
+        style={{
+          height: 180,
+          width: '100%',
+          borderRadius: 8,
+          overflow: 'hidden',
+        }}
         blurRadius={1} // Add blur effect
       >
         {/* Black overlay */}
-        <View className="absolute inset-0 z-10 bg-black" />
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            zIndex: 10,
+          }}
+        />
 
-        <View className="absolute right-2 top-2 flex-row space-x-3">
-          <TouchableOpacity className="p-2 bg-white rounded-full">
+        <View
+          style={{
+            position: 'absolute',
+            right: 10,
+            top: 10,
+            flexDirection: 'row',
+            gap: 10,
+            zIndex: 20,
+          }}>
+          <TouchableOpacity
+            style={{padding: 6, backgroundColor: 'white', borderRadius: 20}}>
             <Icon name="heart" size={14} color="#6F3744" />
           </TouchableOpacity>
-          <TouchableOpacity className="p-2 bg-white rounded-full">
+          <TouchableOpacity
+            onPress={handleAddToCart}
+            style={{padding: 6, backgroundColor: 'white', borderRadius: 20}}>
             <Icon name="shopping-cart" size={14} color="#6F3744" />
           </TouchableOpacity>
         </View>
       </ImageBackground>
 
       {/* Text Section */}
-      <View className="flex-row justify-between w-full p-3">
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: '100%',
+          paddingVertical: 10,
+        }}>
         <View>
-          <Text className="text-tertiary font-bold text-[16px]">{name}</Text>
-          <Text className="text-tertiary font-light text-[12px]">{artist}</Text>
-          <Text className="text-tertiary font-semibold text-[13px]">
+          <Text style={{color: '#6F3744', fontWeight: 'bold', fontSize: 16}}>
+            {name}
+          </Text>
+          <Text style={{color: '#6F3744', fontSize: 12}}>{artist}</Text>
+          <Text style={{color: '#6F3744', fontWeight: '600', fontSize: 13}}>
             KES {price}
           </Text>
         </View>
-        <TouchableHighlight className="p-1 h-6 w-8 items-center justify-center rounded-full">
+        <TouchableHighlight
+          style={{
+            padding: 5,
+            height: 24,
+            width: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 12,
+          }}>
           <DotMenu name="dots-horizontal" size={15} color="black" />
         </TouchableHighlight>
       </View>
